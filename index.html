@@ -24,4 +24,7 @@ function download(name,content,type){let blob=new Blob([content],{type}),url=URL
 function exportCSV(id){let m=data.matches.find(x=>x.id===id);if(!m)return;let rows=[['日付','チーム','対戦相手','セット','時刻','背番号','選手','プレー','結果'],...m.events.map(e=>{let p=player(e.playerId);return [m.date,m.team,m.opponent,e.set,e.time,p?.number||'',p?.name||'登録解除選手',e.skill,e.result]})];download('volley_'+m.id+'.csv','\ufeff'+rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\r\n'),'text/csv;charset=utf-8')}
 function backup(){download('volley_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({version:2,...data},null,2),'application/json')}
 async function restore(file){if(!file)return;try{let d=JSON.parse(await file.text());if(!Array.isArray(d.players)||!Array.isArray(d.matches))throw Error('形式が違います');if(!confirm('現在のデータをバックアップファイルの内容で上書きしますか？'))return;data={players:d.players,matches:d.matches,current:d.current??null};persist();selected=null;draw();alert('復元しました')}catch(e){alert('復元できません：'+e.message)}}draw();
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});</script></body></html>
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="./cloud.js"></script>
+</body></html>
