@@ -15,12 +15,31 @@
 
   const panel = document.createElement("section");
   panel.className = "card";
+  panel.id = "cloud-panel";
+  panel.hidden = true;
   panel.innerHTML = `
     <h2>☁️ クラウド保存</h2>
     <p id="cloud-status">接続を確認中...</p>
     <div id="cloud-controls" class="row"></div>
   `;
-  document.querySelector("main").prepend(panel);
+  const main = document.querySelector("main");
+  const cloudEntry = document.createElement("div");
+  cloudEntry.style.cssText = "text-align:center;margin:18px 0 24px";
+  const openButton = document.createElement("button");
+  openButton.type = "button";
+  openButton.textContent = "☁️ クラウド保存・ログイン";
+  openButton.style.cssText = "width:100%;font-weight:700";
+  openButton.setAttribute("aria-expanded", "false");
+  openButton.setAttribute("aria-controls", "cloud-panel");
+  openButton.addEventListener("click", () => {
+    const opening = panel.hidden;
+    panel.hidden = !opening;
+    openButton.textContent = opening ? "☁️ クラウド保存を閉じる" : "☁️ クラウド保存・ログイン";
+    openButton.setAttribute("aria-expanded", String(opening));
+    if (opening) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  cloudEntry.appendChild(openButton);
+  main.append(cloudEntry, panel);
 
   const status = document.getElementById("cloud-status");
   const controls = document.getElementById("cloud-controls");
