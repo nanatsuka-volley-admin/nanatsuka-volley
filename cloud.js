@@ -98,7 +98,7 @@
       if (response.error) throw response.error;
 
       syncEnabled = true;
-      message("☁️ クラウド保存済み");
+      message("☁️ クラウド保存済み");\n      return true;
     } catch (error) {
       message("保存エラー: " + error.message);
     } finally {
@@ -199,6 +199,60 @@
     });
 
     addButton("クラウドの記録を端末に読み込む", loadCloud);
+
+    addButton("⌚ Watch連携を設定", async () => {
+      if (!data.current || !data.matches.some(m => String(m.id) === String(data.current))) {
+        message("先に記録する試合を開いてください"); return;
+      }
+      if (!confirm("現在開いている試合にApple Watchを連携します。以前のWatch連携キーは無効になります。続けますか？")) return;
+      try {
+        const session = (await client.auth.getSession()).data.session;
+        if (!session) throw new Error("再ログインしてください");
+        const response = await fetch(SUPABASE_URL + "/functions/v1/watch-point", {
+          method: "POST", headers: {"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},
+          body: JSON.stringify({action:"register",match_id:String(data.current)})
+        });
+        const result = await response.json();
+        if (!response.ok || !result.token) throw new Error(result.error || "連携できません");
+        const url = SUPABASE_URL + "/functions/v1/watch-point";
+        const box = document.createElement("textarea");
+        box.readOnly = true; box.rows = 3; box.style.width = "100%";
+        box.value = result.token;
+        controls.appendChild(box);
+        addButton("連携キーをコピー", () => navigator.clipboard.writeText(result.token).then(() => message("キーをコピーしました")).catch(() => message("上のキーを長押ししてコピーしてください")));
+        message("⌚ 連携キーを発行しました。ショートカットのURL: " + url + " ／キーは他人に見せないでください。");
+      } catch (error) { message("Watch連携エラー: " + error.message); }
+    });
+
+    addButton("⌚ Watchの記録を取り込む", async () => {
+      if (!syncEnabled) { message("先に「端末の記録をクラウドに保存」を押してください"); return; }
+      try {
+        const response = await client.from("watch_events").select("id,side,reason,match_id,created_at").order("created_at",{ascending:true}).limit(100);
+        if (response.error) throw response.error;
+        const events = response.data || [];
+        if (!events.length) { message("未取込のWatch記録はありません"); return; }
+        const m = data.matches.find(x => String(x.id) === String(data.current));
+        if (!m || events.some(x => String(x.match_id) !== String(m.id))) {
+          message("Watchの記録先と開いている試合が違います。該当試合を開いてから取り込んでください"); return;
+        }
+        if (!confirm("Watchの" + events.length + "件を現在の試合へ反映しますか？")) return;
+        let count = 0;
+        for (const e of events) {
+          if (typeof setFinished === "function" && (setFinished(m) || courtChangeDue(m))) break;
+          if (!m.serving || (m.serveOrder||[]).filter(x => x!=null).length !== 6) break;
+          const before = (m.pointEvents||[]).length;
+          score(e.side,1,e.reason,null,"Apple Watch");
+          if ((m.pointEvents||[]).length === before) break;
+          count++;
+        }
+        if (!count) { message("取込できません。サーブ順・サーブ権・セット状態を確認してください"); return; }
+        const saved = await saveCloud();
+        if (saved !== true) { message("端末には" + count + "件反映しましたがクラウド保存に失敗。再取込せず、通信を確認してください"); return; }
+        const ids = events.slice(0,count).map(e => e.id);
+        const del = await client.from("watch_events").delete().in("id",ids);
+        message(del.error ? "記録は保存済みですが受付一覧の削除に失敗: "+del.error.message : "⌚ "+count+"件を取り込みました");
+      } catch(error) { message("取込エラー: "+error.message); }
+    });
 
     addButton("ログアウト", async () => {
       syncEnabled = false;
