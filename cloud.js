@@ -87,7 +87,8 @@
       if (response.error) throw response.error;
 
       syncEnabled = true;
-      message("☁️ クラウド保存済み");\n      return true;
+      message("☁️ クラウド保存済み");
+      return true;
     } catch (error) {
       message("保存エラー: " + error.message);
     } finally {
