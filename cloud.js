@@ -28,13 +28,6 @@
   if (!cloudEntry || !openButton || !main) return;
   openButton.setAttribute("aria-expanded", "false");
   openButton.setAttribute("aria-controls", "cloud-panel");
-  openButton.addEventListener("click", () => {
-    const opening = panel.hidden;
-    panel.hidden = !opening;
-    openButton.textContent = opening ? "☁️ クラウド保存を閉じる" : "☁️ クラウド保存・ログイン";
-    openButton.setAttribute("aria-expanded", String(opening));
-    if (opening) panel.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
   cloudEntry.after(panel);
 
   const status = document.getElementById("cloud-status");
