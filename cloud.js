@@ -23,12 +23,9 @@
     <div id="cloud-controls" class="row"></div>
   `;
   const main = document.querySelector("main");
-  const cloudEntry = document.createElement("div");
-  cloudEntry.style.cssText = "text-align:center;margin:18px 0 24px";
-  const openButton = document.createElement("button");
-  openButton.type = "button";
-  openButton.textContent = "☁️ クラウド保存・ログイン";
-  openButton.style.cssText = "width:100%;font-weight:700";
+  const cloudEntry = document.getElementById("cloud-entry");
+  const openButton = document.getElementById("cloud-open-button");
+  if (!cloudEntry || !openButton || !main) return;
   openButton.setAttribute("aria-expanded", "false");
   openButton.setAttribute("aria-controls", "cloud-panel");
   openButton.addEventListener("click", () => {
@@ -38,8 +35,7 @@
     openButton.setAttribute("aria-expanded", String(opening));
     if (opening) panel.scrollIntoView({ behavior: "smooth", block: "start" });
   });
-  cloudEntry.appendChild(openButton);
-  main.append(cloudEntry, panel);
+  cloudEntry.after(panel);
 
   const status = document.getElementById("cloud-status");
   const controls = document.getElementById("cloud-controls");
