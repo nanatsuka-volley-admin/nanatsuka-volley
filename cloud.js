@@ -217,7 +217,7 @@
     addButton("⌚ Watchの記録を取り込む", async () => {
       if (!syncEnabled) { message("先に「端末の記録をクラウドに保存」を押してください"); return; }
       try {
-        const response = await client.from("watch_events").select("id,side,reason,match_id,created_at").order("created_at",{ascending:true}).limit(100);
+        const response = await client.from("watch_events").select("id,side,reason,player_id,match_id,created_at").order("created_at",{ascending:true}).limit(100);
         if (response.error) throw response.error;
         const events = response.data || [];
         if (!events.length) { message("未取込のWatch記録はありません"); return; }
@@ -231,7 +231,7 @@
           if (typeof setFinished === "function" && (setFinished(m) || courtChangeDue(m))) break;
           if (!m.serving || (m.serveOrder||[]).filter(x => x!=null).length !== 6) break;
           const before = (m.pointEvents||[]).length;
-          score(e.side,1,e.reason,null,"Apple Watch");
+          score(e.side,1,e.reason,e.player_id ?? null,"Apple Watch");
           if ((m.pointEvents||[]).length === before) break;
           count++;
         }
