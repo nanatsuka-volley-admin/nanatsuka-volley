@@ -128,5 +128,5 @@ function backup(){download('volley_backup_'+new Date().toISOString().slice(0,10)
 async function restore(file){if(!file)return;try{let d=JSON.parse(await file.text());if(!Array.isArray(d.players)||!Array.isArray(d.matches))throw Error('形式が違います');if(!confirm('現在のデータをバックアップファイルの内容で上書きしますか？'))return;data={players:d.players,matches:d.matches,current:d.current??null};persist();selected=null;draw();alert('復元しました')}catch(e){alert('復元できません：'+e.message)}}draw();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js?v=20261023b', {updateViaCache:'none'}).catch(()=>{});</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="./cloud.js?v=20261023b"></script>
+<script src="./cloud.js?v=20261025-watchfix1"></script>
 </body></html>
