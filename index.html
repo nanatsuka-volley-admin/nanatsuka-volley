@@ -100,7 +100,7 @@ let vdState=(()=>{try{return JSON.parse(localStorage.getItem(vdStoreKey))||{team
 vdState.lineup=Array.isArray(vdState.lineup)?vdState.lineup:[null,null,null,null,null,null];
 vdState.touches=Array.isArray(vdState.touches)?vdState.touches:[];
 let vdSide='ours',vdPlayer=null,vdSkill=null,vdModal=false,vdVideos=new Map();
-const vdSkills={'サーブ':['成功','エース','ミス'],'サーブレシーブ':['A（良好）','B（乱れ）','C（大きく乱れ）','ミス'],'セッターのトス':['良い','乱れ','ミス'],'2段トス':['良い','乱れ','ミス'],'スパイク':['決定','継続','ミス'],'ディグ':['良好','乱れ','ミス'],'連携ミス':['ディグ後のカバー遅れ（ノータッチ）','ディグ後のお見合い','その他の連携ミス'],'ブロック':['得点','ワンタッチ','ミス'],'ツーアタック':['決定','継続','ミス'],'返球':['成功','ミス'],'IN・OUT判断':['IN','OUT','判定不明']};
+const vdSkills={'サーブ':['成功','エース','ミス'],'サーブレシーブ':['A（良好）','B（乱れ）','C（大きく乱れ）','ミス'],'セッターのトス':['良い','乱れ','ミス'],'2段トス':['良い','乱れ','ミス'],'スパイク':['決定','継続','ミス'],'ディグ':['良好','乱れ','ミス'],'チャンスボール処理':['良好（オーバー）','良好（アンダー）','乱れ（オーバー）','乱れ（アンダー）','ミス（オーバー）','ミス（アンダー）','ノータッチ','お見合い'],'連携ミス':['ディグ後のカバー遅れ（ノータッチ）','ディグ後のお見合い','その他の連携ミス'],'ブロック':['得点','ワンタッチ','ミス'],'ツーアタック':['決定','継続','ミス'],'返球':['成功','ミス'],'IN・OUT判断':['IN','OUT','判定不明']};
 function vdPersist(){localStorage.setItem(vdStoreKey,JSON.stringify(vdState))}
 function vdTeam(v){vdState.team=v;vdState.lineup=[null,null,null,null,null,null];vdPlayer=null;vdPersist();draw()}
 function vdOpponent(v){vdState.opponent=v;vdPersist()}
