@@ -100,8 +100,9 @@ let vdState=(()=>{try{return JSON.parse(localStorage.getItem(vdStoreKey))||{team
 vdState.lineup=Array.isArray(vdState.lineup)?vdState.lineup:[null,null,null,null,null,null];
 vdState.touches=Array.isArray(vdState.touches)?vdState.touches:[];
 let vdSide='ours',vdPlayer=null,vdSkill=null,vdModal=false,vdFull=false,vdVideos=new Map();
+function vdInteractionDraw(){if(!vdFull||tab!=='video'||!document.getElementById('vd-fullscreen')){draw();return}const template=document.createElement('div');template.innerHTML=vdFullHtml();const fresh=template.querySelector('#vd-fullscreen'),live=document.getElementById('vd-fullscreen');if(fresh&&live){const oldParts=[...live.children],newParts=[...fresh.children];if(oldParts[0]&&newParts[0])oldParts[0].innerHTML=newParts[0].innerHTML;if(oldParts[2]&&newParts[2])oldParts[2].innerHTML=newParts[2].innerHTML}const app=document.getElementById('app');if(app){app.querySelectorAll('[data-vd-interaction-modal]').forEach(x=>x.remove());if(vdModal){const markup=document.createElement('div');markup.innerHTML=vdPage();const modal=markup.querySelector('[role="dialog"][aria-modal="true"]');if(modal){modal.setAttribute('data-vd-interaction-modal','1');app.appendChild(modal)}}}}
 function vdToggleFull(){vdFull=!vdFull;vdModal=false;draw()}
-function vdUndo(){if(!vdState.touches.length)return alert('取り消す記録がありません');vdState.touches.pop();vdSkill=null;vdModal=false;vdPersist();draw()}
+function vdUndo(){if(!vdState.touches.length)return alert('取り消す記録がありません');vdState.touches.pop();vdSkill=null;vdModal=false;vdPersist();vdInteractionDraw()}
 function vdLast(){const e=vdState.touches.at(-1);return e?(e.side==='ours'?vdPlayerName(e.playerId):'相手')+' / '+e.skill+' / '+e.result:'記録なし'}
 const vdSkills={'サーブ':['成功','エース','ミス'],'サーブレシーブ':['A（良好）','B（乱れ）','C（大きく乱れ）','ミス'],'セッターのトス':['良い','乱れ','ミス'],'2段トス':['良い','乱れ','ミス'],'スパイク':['決定','継続','ミス'],'ディグ':['良好','乱れ','ミス'],'チャンスボール処理':['良好（オーバー）','良好（アンダー）','乱れ（オーバー）','乱れ（アンダー）','ミス（オーバー）','ミス（アンダー）','ノータッチ','お見合い'],'連携ミス':['ディグ後のカバー遅れ（ノータッチ）','ディグ後のお見合い','その他の連携ミス'],'ブロック':['得点','ワンタッチ','ミス'],'ツーアタック':['決定','継続','ミス'],'返球':['成功','ミス'],'IN・OUT判断':['IN','OUT','判定不明']};
 function vdPersist(){localStorage.setItem(vdStoreKey,JSON.stringify(vdState))}
@@ -109,12 +110,12 @@ function vdTeam(v){vdState.team=v;vdState.lineup=[null,null,null,null,null,null]
 function vdOpponent(v){vdState.opponent=v;vdPersist()}
 function vdSet(v){vdFull=false;vdState.set=Math.max(1,Number(v)||1);vdPlayer=null;vdSkill=null;vdPersist();draw()}
 function vdLineup(i,v){const id=v===''?null:v;if(id!=null&&vdState.lineup.some((x,j)=>j!==i&&String(x)===String(id)))return alert('同じ選手は重複配置できません');vdState.lineup[i]=id;vdPlayer=null;vdPersist();draw()}
-function vdChooseSide(v){vdSide=v;vdPlayer=null;vdSkill=null;draw()}
-function vdChoosePlayer(v){vdPlayer=v;vdSkill=null;vdModal=true;draw()}
-function vdOpenModal(){vdSkill=null;vdModal=true;draw()}
-function vdCloseModal(){vdModal=false;vdSkill=null;draw()}
-function vdChooseSkill(v){vdSkill=v;vdModal=true;draw()}
-function vdSave(result){if(!vdSkill)return;if(vdSide==='ours'&&!vdState.lineup.some(id=>id!=null&&String(id)===String(vdPlayer)))return alert('出場選手を選択してください');const idx=vdState.lineup.findIndex(id=>id!=null&&String(id)===String(vdPlayer));vdState.touches.push({set:vdState.set,side:vdSide,playerId:vdSide==='ours'?vdPlayer:null,positionCode:vdSide==='ours'?courtCodes[idx]:null,skill:vdSkill,result,zone:document.getElementById('vd-zone')?.value||'',note:document.getElementById('vd-note')?.value||'',time:new Date().toISOString()});vdSkill=null;vdModal=false;vdPersist();draw()}
+function vdChooseSide(v){vdSide=v;vdPlayer=null;vdSkill=null;vdModal=false;vdInteractionDraw()}
+function vdChoosePlayer(v){vdPlayer=v;vdSkill=null;vdModal=true;vdInteractionDraw()}
+function vdOpenModal(){vdSkill=null;vdModal=true;vdInteractionDraw()}
+function vdCloseModal(){vdModal=false;vdSkill=null;vdInteractionDraw()}
+function vdChooseSkill(v){vdSkill=v;vdModal=true;vdInteractionDraw()}
+function vdSave(result){if(!vdSkill)return;if(vdSide==='ours'&&!vdState.lineup.some(id=>id!=null&&String(id)===String(vdPlayer)))return alert('出場選手を選択してください');const idx=vdState.lineup.findIndex(id=>id!=null&&String(id)===String(vdPlayer));vdState.touches.push({set:vdState.set,side:vdSide,playerId:vdSide==='ours'?vdPlayer:null,positionCode:vdSide==='ours'?courtCodes[idx]:null,skill:vdSkill,result,zone:document.getElementById('vd-zone')?.value||'',note:document.getElementById('vd-note')?.value||'',time:new Date().toISOString()});vdSkill=null;vdModal=false;vdPersist();vdInteractionDraw()}
 function vdDelete(i){if(!vdState.touches[i]||!confirm('このタッチ記録を削除しますか？'))return;vdState.touches.splice(i,1);vdPersist();draw()}
 function vdPlayerName(id){return data.players.find(p=>String(p.id)===String(id))?.name||'登録解除選手'}
 function vdVideoLoad(input){const file=input.files?.[0];if(!file)return;if(!file.type.startsWith('video/')&&!/\.(mp4|mov|m4v|webm)$/i.test(file.name))return alert('動画を選んでください');const old=vdVideos.get(vdState.set);if(old)URL.revokeObjectURL(old.url);vdVideos.set(vdState.set,{url:URL.createObjectURL(file),name:file.name});draw()}
