@@ -1,0 +1,64 @@
+#defense-board {
+  box-sizing: border-box;
+  width: min(calc(100% - 16px), 560px);
+  max-width: none;
+  max-height: calc(100% - 16px);
+  border: 0;
+  border-radius: 16px;
+  padding: 14px;
+  color: #142b43;
+}
+#defense-board::backdrop { background: rgb(10 25 45 / 72%); }
+#defense-board .defense-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+#defense-board h2, #defense-board p { margin: 5px 0; }
+#defense-board .defense-close { margin: 0; }
+#defense-board .defense-net {
+  margin-top: 10px;
+  border-radius: 6px 6px 0 0;
+  padding: 4px;
+  background: #173752;
+  color: white;
+  text-align: center;
+  font-weight: 700;
+}
+#defense-board .defense-court {
+  position: relative;
+  width: 100%;
+  height: clamp(240px, 58dvh, 480px);
+  outline: 2px solid white;
+  outline-offset: -2px;
+  background: linear-gradient(to bottom, #b85c2d 33%, white 33% 34%, #a44f25 34%);
+}
+#defense-board .defense-token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  width: min(28%, 120px);
+  min-height: 48px;
+  margin: 0;
+  padding: 3px 4px;
+  border: 2px solid white;
+  border-radius: 12px;
+  background: #173752;
+  color: white;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+#defense-board .defense-token[data-row="back"] { background: #075e55; }
+#defense-board .defense-token:active { z-index: 2; cursor: grabbing; }
+#defense-board .defense-token:focus-visible { z-index: 2; }
+#defense-board .defense-token small, #defense-board .defense-token span { display: block; }
+#defense-board .defense-token span { overflow-wrap: anywhere; line-height: 1.2; }
+#defense-board .defense-directions {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  font-size: 12px;
+}
